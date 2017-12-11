@@ -15,15 +15,16 @@ Require-Bundle: org.eclipse.xtext,
  org.eclipse.xtend.lib,
  org.eclipse.emf.common
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Export-Package: org.xtext.demo.fsh,
- org.xtext.demo.serializer,
- org.xtext.demo.parser.antlr.internal,
- org.xtext.demo,
- org.xtext.demo.validation,
- org.xtext.demo.fsh.util,
- org.xtext.demo.parser.antlr,
- org.xtext.demo.services,
- org.xtext.demo.scoping,
+Export-Package: org.xtext.demo,
+ org.xtext.demo.fsh,
  org.xtext.demo.fsh.impl,
- org.xtext.demo.generator
+ org.xtext.demo.fsh.util,
+ org.xtext.demo.generator,
+ org.xtext.demo.interpreter,
+ org.xtext.demo.parser.antlr,
+ org.xtext.demo.parser.antlr.internal,
+ org.xtext.demo.scoping,
+ org.xtext.demo.serializer,
+ org.xtext.demo.services,
+ org.xtext.demo.validation
 Import-Package: org.apache.log4j

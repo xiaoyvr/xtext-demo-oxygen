@@ -6,6 +6,9 @@ package org.xtext.demo.ui
 import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
 import org.eclipse.xtext.ui.shared.Access
 import org.eclipse.xtext.ui.editor.model.ResourceForIEditorInputFactory
+import org.eclipse.xtext.ui.editor.autoedit.DefaultAutoEditStrategyProvider
+import org.eclipse.jface.text.IDocument
+import org.xtext.demo.ui.autoedit.InterpreterAutoEdit
 
 /**
  * Use this class to register components to be used within the Eclipse IDE.
@@ -19,5 +22,16 @@ class FshUiModule extends AbstractFshUiModule {
 	override bindIResourceForEditorInputFactory() {
 		ResourceForIEditorInputFactory
 	}
-
+	
+	override bindAbstractEditStrategyProvider() {
+		AutoEditStrategy
+	}
+	
+	static class AutoEditStrategy extends DefaultAutoEditStrategyProvider {
+		override configure(IEditStrategyAcceptor acceptor) {
+			super.configure(acceptor);
+			//acceptor.accept(newShortCuts("PI", "PI"));
+			acceptor.accept(new InterpreterAutoEdit(), IDocument.DEFAULT_CONTENT_TYPE);
+		}
+	}	
 }
