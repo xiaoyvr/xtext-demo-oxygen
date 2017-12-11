@@ -1,0 +1,9 @@
+grammar org.xtext.demo.Fsh with org.eclipse.xtext.common.Terminals
+
+generate fsh "http://www.xtext.org/demo/Fsh"
+
+Model:
+	greetings+=Greeting*;
+	
+Greeting:
+	'Hello' name=ID '!';
