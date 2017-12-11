@@ -1,7 +1,6 @@
 package org.xtext.demo.interpreter
 
 import org.xtext.demo.fsh.Expression
-import org.eclipse.xtext.util.PolymorphicDispatcher
 import com.google.common.collect.ImmutableMap
 import java.math.BigDecimal
 import org.xtext.demo.fsh.NumberLiteral
@@ -10,40 +9,64 @@ import org.xtext.demo.fsh.Minus
 import org.xtext.demo.fsh.Div
 import java.math.RoundingMode
 import org.xtext.demo.fsh.Multi
+import org.xtext.demo.fsh.FunctionCall
+import com.google.common.collect.Maps
+import org.xtext.demo.fsh.DeclaredParameter
+import org.xtext.demo.fsh.Definition
+import org.xtext.demo.fsh.Param
 
-public class Calculator {
-	
-	val dispatcher = PolymorphicDispatcher.<BigDecimal>createForSingleTarget("internalEvaluate", 2, 2, this);
-	def evaluate(Expression expr) {
-		dispatcher.invoke(expr, ImmutableMap.<String,BigDecimal>of());
+class Calculator {
+
+	def BigDecimal evaluate(Expression obj) {
+		return evaluate(obj, ImmutableMap.<String, BigDecimal>of())
+	}
+
+	def BigDecimal evaluate(Expression obj, ImmutableMap<String, BigDecimal> values) {
+		return internalEvaluate(obj, values)
+	}
+
+	def dispatch protected internalEvaluate(NumberLiteral e, ImmutableMap<String, BigDecimal> values) {
+		e.value
+	}
+
+	/** 
+	 * @param values the currently known values by name 
+	 */
+	def dispatch protected BigDecimal internalEvaluate(FunctionCall e, ImmutableMap<String, BigDecimal> values) {
+		if (e.func instanceof DeclaredParameter) {
+			return values.get(e.func.name)
+		}
+		switch d : e.func {
+			Definition: {
+				var params = Maps.newHashMap
+				for (var int i = 0; i < e.args.size; i++) {
+					var declaredParameter = d.args.get(i)
+					var evaluate = evaluate(e.args.get(i), values)
+					params.put(declaredParameter.getName(), evaluate)
+				}
+				return evaluate(d.expr, ImmutableMap.copyOf(params))
+			}
+		}
+	}
+
+	def dispatch protected BigDecimal internalEvaluate(Plus plus, ImmutableMap<String, BigDecimal> values) {
+		evaluate(plus.left, values) + evaluate(plus.right, values)
+	}
+
+	def dispatch protected BigDecimal internalEvaluate(Minus minus, ImmutableMap<String, BigDecimal> values) {
+		evaluate(minus.left, values) - evaluate(minus.right, values)
+	}
+
+	def dispatch protected BigDecimal internalEvaluate(Div div, ImmutableMap<String, BigDecimal> values) {
+		evaluate(div.left, values).divide(evaluate(div.right, values), 20, RoundingMode.HALF_UP)
 	}
 	
-	protected def internalEvaluate(Expression e, ImmutableMap<String,BigDecimal> values) { 
-		throw new UnsupportedOperationException(e.toString());
+	def dispatch protected BigDecimal internalEvaluate(Param param, ImmutableMap<String, BigDecimal> values) {
+		values.get(param.getParam().getName())
 	}
 	
-	protected def internalEvaluate(NumberLiteral e, ImmutableMap<String,BigDecimal> values) { 
-		return e.getValue();
+
+	def dispatch protected BigDecimal internalEvaluate(Multi multi, ImmutableMap<String, BigDecimal> values) {
+		evaluate(multi.left, values) * evaluate(multi.right, values)
 	}
-	
-	protected def internalEvaluate(Plus plus, ImmutableMap<String,BigDecimal> values) {
-		return evaluateAsBigDecimal(plus.getLeft(),values).add(evaluateAsBigDecimal(plus.getRight(),values));
-	}
-		
-	protected def internalEvaluate(Minus minus, ImmutableMap<String,BigDecimal> values) {
-		return evaluateAsBigDecimal(minus.getLeft(),values).subtract(evaluateAsBigDecimal(minus.getRight(),values));
-	}
-	protected def internalEvaluate(Div div, ImmutableMap<String,BigDecimal> values) {
-		val left = evaluateAsBigDecimal(div.getLeft(),values);
-		val right = evaluateAsBigDecimal(div.getRight(),values);
-		return left.divide(right,20,RoundingMode.HALF_UP);
-	}
-	protected def internalEvaluate(Multi multi, ImmutableMap<String,BigDecimal> values) {
-		return evaluateAsBigDecimal(multi.getLeft(),values).multiply(evaluateAsBigDecimal(multi.getRight(),values));
-	}
-	
-	private def evaluateAsBigDecimal(Expression obj, ImmutableMap<String,BigDecimal> values) {
-		return dispatcher.invoke(obj, values);
-	}
-	
 }
