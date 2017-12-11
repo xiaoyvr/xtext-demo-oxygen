@@ -20,7 +20,7 @@ local.properties
 .loadpath
 
 # Locally stored "Eclipse launch configurations"
-*.launch
+# *.launch
 
 bin/
 

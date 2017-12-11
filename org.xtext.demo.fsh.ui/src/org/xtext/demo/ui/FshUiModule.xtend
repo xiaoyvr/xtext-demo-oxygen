@@ -4,10 +4,20 @@
 package org.xtext.demo.ui
 
 import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
+import org.eclipse.xtext.ui.shared.Access
+import org.eclipse.xtext.ui.editor.model.ResourceForIEditorInputFactory
 
 /**
  * Use this class to register components to be used within the Eclipse IDE.
  */
 @FinalFieldsConstructor
 class FshUiModule extends AbstractFshUiModule {
+	override provideIAllContainersState() {
+		Access.getWorkspaceProjectsState()
+	}
+
+	override bindIResourceForEditorInputFactory() {
+		ResourceForIEditorInputFactory
+	}
+
 }
