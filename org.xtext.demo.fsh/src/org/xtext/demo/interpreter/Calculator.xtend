@@ -13,38 +13,37 @@ import org.xtext.demo.fsh.Multi
 
 public class Calculator {
 	
-	val dispatcher = PolymorphicDispatcher.createForSingleTarget("internalEvaluate", 2, 2, this);
+	val dispatcher = PolymorphicDispatcher.<BigDecimal>createForSingleTarget("internalEvaluate", 2, 2, this);
 	def evaluate(Expression expr) {
-		dispatcher.invoke(expr, ImmutableMap.<String,Object>of());
+		dispatcher.invoke(expr, ImmutableMap.<String,BigDecimal>of());
 	}
 	
-	protected def internalEvaluate(Expression e, ImmutableMap<String,Object> values) { 
+	protected def internalEvaluate(Expression e, ImmutableMap<String,BigDecimal> values) { 
 		throw new UnsupportedOperationException(e.toString());
 	}
 	
-	protected def internalEvaluate(NumberLiteral e, ImmutableMap<String,Object> values) { 
+	protected def internalEvaluate(NumberLiteral e, ImmutableMap<String,BigDecimal> values) { 
 		return e.getValue();
 	}
 	
-	protected def internalEvaluate(Plus plus, ImmutableMap<String,Object> values) {
+	protected def internalEvaluate(Plus plus, ImmutableMap<String,BigDecimal> values) {
 		return evaluateAsBigDecimal(plus.getLeft(),values).add(evaluateAsBigDecimal(plus.getRight(),values));
 	}
 		
-	protected def internalEvaluate(Minus minus, ImmutableMap<String,Object> values) {
+	protected def internalEvaluate(Minus minus, ImmutableMap<String,BigDecimal> values) {
 		return evaluateAsBigDecimal(minus.getLeft(),values).subtract(evaluateAsBigDecimal(minus.getRight(),values));
 	}
-	protected def internalEvaluate(Div div, ImmutableMap<String,Object> values) {
+	protected def internalEvaluate(Div div, ImmutableMap<String,BigDecimal> values) {
 		val left = evaluateAsBigDecimal(div.getLeft(),values);
 		val right = evaluateAsBigDecimal(div.getRight(),values);
 		return left.divide(right,20,RoundingMode.HALF_UP);
 	}
-	protected def internalEvaluate(Multi multi, ImmutableMap<String,Object> values) {
+	protected def internalEvaluate(Multi multi, ImmutableMap<String,BigDecimal> values) {
 		return evaluateAsBigDecimal(multi.getLeft(),values).multiply(evaluateAsBigDecimal(multi.getRight(),values));
 	}
 	
-	private def evaluateAsBigDecimal(Expression obj, ImmutableMap<String,Object> values) {
-		val invoke = dispatcher.invoke(obj, values) as BigDecimal;
-		return invoke;
+	private def evaluateAsBigDecimal(Expression obj, ImmutableMap<String,BigDecimal> values) {
+		return dispatcher.invoke(obj, values);
 	}
 	
 }

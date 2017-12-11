@@ -3,6 +3,11 @@
  */
 package org.xtext.demo.validation
 
+import com.google.inject.Inject
+import org.eclipse.xtext.validation.Check
+import org.xtext.demo.interpreter.Calculator
+import org.xtext.demo.fsh.Div
+import static org.xtext.demo.fsh.FshPackage.Literals.*
 
 /**
  * This class contains custom validation rules. 
@@ -11,15 +16,13 @@ package org.xtext.demo.validation
  */
 class FshValidator extends AbstractFshValidator {
 	
-//	public static val INVALID_NAME = 'invalidName'
-//
-//	@Check
-//	def checkGreetingStartsWithCapital(Greeting greeting) {
-//		if (!Character.isUpperCase(greeting.name.charAt(0))) {
-//			warning('Name should start with a capital', 
-//					FshPackage.Literals.GREETING__NAME,
-//					INVALID_NAME)
-//		}
-//	}
+	@Inject Calculator calculator
+
+	@Check
+	def checkDivByZero(Div div) {
+		val bigDecimal = calculator.evaluate(div.right)
+		if (bigDecimal.doubleValue() == 0.0) 
+			error("Division by zero detected.", DIV__RIGHT)
+	}
 	
 }
